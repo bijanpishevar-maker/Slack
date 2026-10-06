@@ -18,6 +18,67 @@ regression suite asserts the spreadsheet's totals **to the cent**.
 4. The resulting quote (drive cost, load/unload cost, overnight cost, optional
    valuation adjustment, and total) is posted back to the user via DM.
 
+## Text mode (`key:value`)
+
+`/movequote` also accepts inline `key:value` arguments, so you can get a quote
+without opening the modal. When the command has text, the app parses it,
+calculates, and replies **ephemerally** (only you see it); on a parse or
+calculation error it replies ephemerally with the error and a one-line usage
+hint. Running `/movequote` with **no** text still opens the modal.
+
+```
+/movequote location:"Salt Lake/Ogden" class:under trucks:1 travel:2 labor:2 miles:3953 drivehrs:0 load:5 weight:1316 days:0 valuation:full
+```
+
+- Quote multi-word values: `location:"Salt Lake/Ogden"` (single quotes work too).
+- Defaults mirror the modal: `trucks:1`, `drivehrs:0`, `days:0`,
+  `valuation:full`. Required: `location`, `class`, `travel`, `labor`, `load`,
+  `weight`, and `miles` (unless you supply `from:`/`to:` — see below).
+
+Accepted keys and aliases:
+
+| Canonical field      | Keys accepted                                  |
+| -------------------- | ---------------------------------------------- |
+| location             | `location`                                     |
+| weightClass          | `class` / `weightclass`                        |
+| trucks               | `trucks`                                        |
+| travelMovers         | `travel` / `travelmovers`                      |
+| laborMovers          | `labor` / `labormovers`                        |
+| totalMiles           | `miles` / `totalmiles`                         |
+| additionalDriveHours | `drivehrs` / `additionaldrivehours`            |
+| loadUnloadHours      | `load` / `loadhrs` / `loadunloadhours`         |
+| weightLbs            | `weight` / `weightlbs`                          |
+| additionalDays       | `days` / `additionaldays`                      |
+| valuation            | `valuation`                                     |
+| origin               | `from` / `origin`                              |
+| destination          | `to` / `destination`                           |
+
+Value aliases:
+
+- **class:** `under` / `u` / `under6000` → `Under 6000lbs`;
+  `over` / `o` / `over6000` → `Over 6000lbs`.
+- **valuation:** `full` → `Full Value`; `250` → `$250 Deductible`;
+  `500` → `$500 Deductible`; `0.60` / `perpound` / `pp` → `$0.60 Per Pound`.
+
+## Optional: ZIP/address → mileage auto-lookup
+
+By default you enter one-way miles directly. Optionally, the app can resolve
+driving miles from an origin and destination (ZIP codes or addresses) via the
+Google Distance Matrix API:
+
+- Set `GOOGLE_MAPS_API_KEY` (or `DISTANCE_API_KEY`) in your environment.
+- **Modal:** leave *Total Miles* blank and fill in *Origin* and *Destination*.
+- **Text mode:** omit `miles:` and provide `from:` and `to:`, e.g.
+  `/movequote location:Spokane class:under travel:2 labor:2 load:4 weight:2000 from:84101 to:97201`.
+
+**Manual miles always win** — if you provide miles, the lookup is skipped. The
+feature is **off unless the key is set**: without a key, the app still works
+normally with manual miles, and asking for a lookup returns a clear error
+(_"Provide miles directly, or set GOOGLE_MAPS_API_KEY and give both origin and
+destination."_). The API key is never logged. The lookup logic
+(`src/distance.js`) takes an injectable fetcher so it is unit-tested without
+any network access.
+
 ## The formula chain (reproduced exactly)
 
 Rates come from the **GM Adjustments** rate card, keyed by
@@ -152,6 +213,7 @@ Copy `.env.example` to `.env` and fill in:
 | `SLACK_SIGNING_SECRET` | yes (HTTP mode)     | Verifies requests from Slack                         |
 | `SLACK_APP_TOKEN`      | socket mode only    | App-level token (`xapp-…`), `connections:write`      |
 | `PORT`                 | no (default 3000)   | HTTP listen port when not in socket mode             |
+| `GOOGLE_MAPS_API_KEY`  | no (optional)       | Enables ZIP/address → mileage lookup; manual miles are the fallback and the feature is off unless this is set (`DISTANCE_API_KEY` also accepted) |
 
 If `SLACK_APP_TOKEN` is set the app starts in **socket mode**; otherwise it
 starts an **HTTP** server on `PORT`.
@@ -170,10 +232,19 @@ npm start
 npm test
 ```
 
-The suite (`test/calculator.test.js`, run with Node's built-in test runner)
-covers the two spreadsheet regression fixtures asserted to the cent, valuation
-bracket lookups and boundaries, overnight tiers (including the out-of-range
-throw), ROUNDUP day behavior, input validation, and defaults.
+The suite (run with Node's built-in test runner) covers:
+
+- `test/calculator.test.js` — the two spreadsheet regression fixtures asserted
+  to the cent, valuation bracket lookups and boundaries, overnight tiers
+  (including the out-of-range throw), ROUNDUP day behavior, input validation,
+  and defaults.
+- `test/parse.test.js` — the `key:value` text parser: a full valid parse (fed
+  through the engine to the exact total), class/valuation aliases, defaults,
+  quoted locations, key aliases, `from:`/`to:` capture, and clear throws on
+  unknown/missing fields.
+- `test/distance.test.js` — the mileage lookup with an injected fake fetcher
+  (no network): manual miles win, resolution via the fetcher, and the clear
+  error when no path is available.
 
 ## Example
 
