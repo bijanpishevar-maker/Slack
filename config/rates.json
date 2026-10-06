@@ -1,0 +1,78 @@
+{
+  "constants": {
+    "milesPerDay": 550,
+    "billableHrsPerDay": 11,
+    "baseOvernight": 250,
+    "cubesPerLb": 6,
+    "maxTravelMovers": 10
+  },
+  "locations": {
+    "Fort Collins": {
+      "Over 6000lbs": { "truckRate": 120, "manRate": 55 },
+      "Under 6000lbs": { "truckRate": 95, "manRate": 55 }
+    },
+    "Spokane": {
+      "Over 6000lbs": { "truckRate": 120, "manRate": 55 },
+      "Under 6000lbs": { "truckRate": 95, "manRate": 55 }
+    },
+    "Salt Lake/Ogden": {
+      "Over 6000lbs": { "truckRate": 120, "manRate": 55 },
+      "Under 6000lbs": { "truckRate": 95, "manRate": 55 }
+    },
+    "Evansville": {
+      "Over 6000lbs": { "truckRate": 120, "manRate": 60 },
+      "Under 6000lbs": { "truckRate": 100, "manRate": 60 }
+    },
+    "Seattle": {
+      "Over 6000lbs": { "truckRate": 120, "manRate": 65 },
+      "Under 6000lbs": { "truckRate": 110, "manRate": 60 }
+    }
+  },
+  "weightClasses": ["Over 6000lbs", "Under 6000lbs"],
+  "valuations": {
+    "Full Value": [],
+    "$250 Deductible": [
+      { "under": 5001, "value": -40 },
+      { "under": 10001, "value": -53 },
+      { "under": 15001, "value": -64 },
+      { "under": 20001, "value": -71 },
+      { "under": 25001, "value": -89 },
+      { "under": 30001, "value": -107 },
+      { "under": 35001, "value": -134 },
+      { "under": 40001, "value": -153 },
+      { "under": 100001, "value": -201 },
+      { "value": -202 }
+    ],
+    "$500 Deductible": [
+      { "under": 5001, "value": -56 },
+      { "under": 10001, "value": -82 },
+      { "under": 15001, "value": -101 },
+      { "under": 20001, "value": -121 },
+      { "under": 25001, "value": -142 },
+      { "under": 30001, "value": -172 },
+      { "under": 35001, "value": -203 },
+      { "under": 40001, "value": -234 },
+      { "under": 100001, "value": -326 },
+      { "value": -326 }
+    ],
+    "$0.60 Per Pound": [
+      { "under": 5001, "value": -93 },
+      { "under": 10001, "value": -138 },
+      { "under": 15001, "value": -182 },
+      { "under": 20001, "value": -222 },
+      { "under": 25001, "value": -264 },
+      { "under": 30001, "value": -315 },
+      { "under": 35001, "value": -364 },
+      { "under": 40001, "value": -416 },
+      { "under": 50001, "value": -464 },
+      { "under": 60001, "value": -537 },
+      { "under": 75001, "value": -620 },
+      { "under": 100001, "value": -762 },
+      { "under": 125001, "value": -921 },
+      { "under": 150001, "value": -1079 },
+      { "under": 175001, "value": -1397 },
+      { "under": 200001, "value": -1556 },
+      { "value": -1714 }
+    ]
+  }
+}
