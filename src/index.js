@@ -7,7 +7,24 @@
 
 require('dotenv').config();
 
+const http = require('http');
+
 const { createApp } = require('./app');
+
+/**
+ * In socket mode the app opens an outbound websocket and binds NO port, but
+ * many cloud hosts fail a deploy with "no open ports detected" unless something
+ * is listening. Start a tiny HTTP server that answers 200 "ok" to any request
+ * so the host's health check passes. Returns the bound server.
+ */
+function startHealthServer(port) {
+  const server = http.createServer((req, res) => {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('ok');
+  });
+  server.listen(port);
+  return server;
+}
 
 async function main() {
   const useSocketMode = Boolean(process.env.SLACK_APP_TOKEN);
@@ -17,7 +34,8 @@ async function main() {
 
   if (useSocketMode) {
     await app.start();
-    console.log('⚡️ LD move calculator is running (socket mode)');
+    startHealthServer(port);
+    console.log(`⚡️ Move Quote app running (socket mode); health server on :${port}`);
   } else {
     await app.start(port);
     console.log(`⚡️ LD move calculator is running (HTTP) on port ${port}`);

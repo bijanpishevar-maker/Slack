@@ -226,6 +226,14 @@ cp .env.example .env   # then fill in real values
 npm start
 ```
 
+## Deployment
+
+To run the app always-on in the cloud (so `/movequote` works 24/7), see
+**[DEPLOY.md](DEPLOY.md)** for a click-by-click guide. The recommended host is
+[Render](https://render.com) via the included `render.yaml` blueprint; a
+`Procfile` is also provided for Railway/Heroku-style hosts. Secrets are pasted
+into the host's dashboard and are never stored in the repo.
+
 ## Running tests
 
 ```bash
