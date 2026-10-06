@@ -1,0 +1,25 @@
+{
+  "name": "empire-ld-move-calculator",
+  "version": "1.0.0",
+  "description": "Slack app that replicates the MASTER - LOCATION LD CALCULATOR long-distance moving quote spreadsheet via a /movequote slash command",
+  "private": true,
+  "type": "commonjs",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test"
+  },
+  "keywords": [
+    "slack",
+    "bolt",
+    "moving",
+    "calculator",
+    "quote",
+    "long-distance"
+  ],
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@slack/bolt": "^3.22.0",
+    "dotenv": "^16.4.5"
+  }
+}
